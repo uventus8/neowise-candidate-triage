@@ -8,29 +8,29 @@
     body { max-width: 40rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
     textarea { box-sizing: border-box; display: block; width: 100%; margin: .5rem 0; padding: .5rem; font: inherit; }
     button { padding: .4rem .8rem; font: inherit; }
-    pre { white-space: pre-wrap; }
+    #status { min-height: 1.5em; }
+    #status[data-state="manual"], #status[data-state="tooLong"], #status[data-state="error"], #status[data-state="invalid"] {
+      padding: .5rem .75rem; border-left: .25rem solid #b45309; background: #fef3c7; color: #3b2a06;
+    }
+    #draft { white-space: pre-wrap; overflow-wrap: anywhere; padding: .5rem .75rem; border: 1px solid #ccc; }
   </style>
 </head>
 <body>
+  <main>
   <h1>Входящие заявки</h1>
-  <form>
+  <form id="triage-form">
     <label for="message">Текст заявки</label>
     <textarea id="message" rows="4"></textarea>
     <button type="submit">Разобрать заявку</button>
   </form>
-  <pre id="result" aria-live="polite"></pre>
-  <script type="module">
-    const form = document.querySelector("form");
-    const result = document.querySelector("#result");
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const reply = await fetch("/api/triage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: document.querySelector("#message").value }),
-      });
-      result.textContent = JSON.stringify(await reply.json(), null, 2);
-    });
-  </script>
+  <p id="status" role="status" aria-live="polite"></p>
+  <section id="result" hidden aria-labelledby="result-heading">
+    <h2 id="result-heading">Результат AI</h2>
+    <p>Тема: <strong id="topic"></strong></p>
+    <p>Черновик ответа (проверьте перед отправкой клиенту):</p>
+    <p id="draft"></p>
+  </section>
+  </main>
+  <script type="module" src="/app.mjs"></script>
 </body>
 </html>
